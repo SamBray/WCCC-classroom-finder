@@ -26,9 +26,27 @@ local oldClassroomRow
 local classroomSelectText
 
 local goButton
+
+local currentLatitude
+local currentLongitude
+local gpsError = true
+local gpsTime
+
+--create GPS listener
+local function locationHandler(event)
+	if(event.errorCode) then
+		gpsError = true
+	else
+		gpsError = false
+		currentLatitude = event.latitude
+		currentLongitude = event.longitude
+		gpsTime = system.getTimer()
+	end
+end
+
 --utility function: split string into table based on delimiter
 --credit: https://helloacm.com/split-a-string-in-lua/
-function split(s, delimiter)
+local function split(s, delimiter)
     result = {};
     for match in (s..delimiter):gmatch("(.-)"..delimiter) do
         table.insert(result, match);
@@ -211,31 +229,37 @@ end
 
 --handle go button
 local function goToMap(event)
-	--calculate the closest entrance
-	local lat,long = 200,200
-	local bestDistance = math.huge
-	local bestEntrance = 0
-	local currentBuilding = oldBuildingRow.params.id
-	for index = 1, #(entranceTable[currentBuilding]) do
-		local dist = math.sqrt((lat - entranceTable[currentBuilding][index].latitude)^2 + (long - entranceTable[currentBuilding][index].longitude)^2)
-		if dist < bestDistance then
-			bestDistance = dist
-			bestEntrance = index
+	if gpsError or currentLatitude == nil or currentLongitude == nil or (system.getTimer() - gpsTime) > 10000 then
+		--either GPS error, no data recorded on read?? or more than 10 seconds elapsed since last reading (could be inaccurate)
+		composer.gotoScene("gpsError", { time=800, effect="crossFade" })
+	else
+		--calculate the closest entrance
+		local lat = currentLatitude
+		local long = currentLongitude
+		local bestDistance = math.huge
+		local bestEntrance = 0
+		local currentBuilding = oldBuildingRow.params.id
+		for index = 1, #(entranceTable[currentBuilding]) do
+			local dist = math.sqrt((lat - entranceTable[currentBuilding][index].latitude)^2 + (long - entranceTable[currentBuilding][index].longitude)^2)
+			if dist < bestDistance then
+				bestDistance = dist
+				bestEntrance = index
+			end
 		end
+		
+		--set up table for map
+		local mapTable = {}
+		mapTable.mapFile = oldBuildingRow.params.image
+		mapTable.mapHeight = oldBuildingRow.params.height
+		mapTable.mapWidth = oldBuildingRow.params.width
+		mapTable.classroomX = oldClassroomRow.params.x
+		mapTable.classroomY = oldClassroomRow.params.y
+		mapTable.entranceX = entranceTable[currentBuilding][bestEntrance].x
+		mapTable.entranceY = entranceTable[currentBuilding][bestEntrance].y
+		composer.setVariable("mapTable", mapTable)
+		
+		composer.gotoScene("map", { time=800, effect="crossFade" })
 	end
-	
-	--set up table for map
-	local mapTable = {}
-	mapTable.mapFile = oldBuildingRow.params.image
-	mapTable.mapHeight = oldBuildingRow.params.height
-	mapTable.mapWidth = oldBuildingRow.params.width
-	mapTable.classroomX = oldClassroomRow.params.x
-	mapTable.classroomY = oldClassroomRow.params.y
-	mapTable.entranceX = entranceTable[currentBuilding][bestEntrance].x
-	mapTable.entranceY = entranceTable[currentBuilding][bestEntrance].y
-	composer.setVariable("mapTable", mapTable)
-	
-	composer.gotoScene("map", { time=800, effect="crossFade" })
 end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -292,6 +316,9 @@ function scene:create( event )
 	goButton:setFillColor(textColor)
 	goButton:addEventListener("tap", goToMap)
 	goButton.isVisible = false
+	
+	--add the GPS listener
+	Runtime:addEventListener("location",locationHandler)
 end
 
 
@@ -322,7 +349,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-		composer.removeScene("classroomMenu")
+		--composer.removeScene("classroomMenu")
 	end
 end
 
