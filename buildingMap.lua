@@ -17,8 +17,14 @@ local buildings
 local function locationHandler(event)
 	if(event.errorCode) then
 		print(debugText.."Error in GPS handler!")
-	else
-		
+	elseif map ~= nil then
+		--whenever the user moves, update their location
+		if currentLocationMarker ~= nil then
+			--need to remove the old marker
+			map:removeMarker(currentLocationMarker)
+		end
+		--add a new marker at the user's current location
+		currentLocationMarker = map:addMarker(event.latitude, event.longitude, {title = "You Are Here"})
 	end
 end
 
