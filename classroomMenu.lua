@@ -8,6 +8,8 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
+local debugText = "ClassroomFinderOutput: "
+
 local textColor = {0,0,0}
 local backgroundColor = {1,1,1}
 local accentColor = {0,0,0}
@@ -41,6 +43,7 @@ local function locationHandler(event)
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
+		print("GPS Event: Latitude: "..event.latitude.." Longitude: "..event.longitude)
 	end
 end
 
@@ -73,7 +76,7 @@ local function readBuildings()
 			buildingTable[currentIndex].height = tonumber(tokens[5])
 			buildingTable[currentIndex].id = split(tokens[2],"%.")[1]
 		end
-		io.close(file)
+		file:close()
 		
 		--sort the buildings
 		local function compare(a,b)
@@ -98,11 +101,14 @@ local function readBuildingInfo(buildingID, buildingFile)
 		for line in file:lines() do
 			if line == "" then
 				--skip
-			elseif line == "!classroom" then
+			--elseif line == "!classroom" then
+			elseif line:find("!classroom") ~= nil then
 				--set read mode to classroom
+				print(debugText.."Reading classrooms...") 
 				mode = "classroom"
 				index = 1
-			elseif line == "!entrance" then
+			--elseif line == "!entrance" then
+			elseif line:find("!entrance") ~= nil then
 				--set read mode to entrance
 				mode = "entrance"
 				index = 1
@@ -114,7 +120,7 @@ local function readBuildingInfo(buildingID, buildingFile)
 				classroomTable[buildingID][index].x = tonumber(tokens[2])
 				classroomTable[buildingID][index].y = tonumber(tokens[3])
 				index = index + 1
-			else
+			elseif mode == "entrance" then
 				--reading an entrance
 				local tokens = split(line, ",")
 				entranceTable[buildingID][index] = {}
@@ -125,6 +131,9 @@ local function readBuildingInfo(buildingID, buildingFile)
 				index = index + 1
 			end
 		end
+		
+		--close the file
+		file:close()
 		--sort the classrooms
 		local function compare(a,b)
 			return a.name < b.name
