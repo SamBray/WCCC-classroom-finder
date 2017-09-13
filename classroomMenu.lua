@@ -18,7 +18,7 @@ local overColor = {0,0,.6, .2}
 
 local classroomTable = {}
 local entranceTable = {}
-local buildingTable = {}
+local buildingTable = composer.getVariable("buildings")
 
 local buildingTableView
 local oldBuildingRow
@@ -55,35 +55,6 @@ local function split(s, delimiter)
         table.insert(result, match);
     end
     return result;
-end
-
---file reading functions
-local function readBuildings()
-	local filePath = system.pathForFile("res/buildings.data")
-	local file, errorString = io.open(filePath, "r")
-	
-	if not file then
-		print("File error: "..errorString)
-	else
-		for line in file:lines() do
-			local currentIndex = #buildingTable + 1
-			local tokens = split(line, ",")
-			buildingTable[currentIndex] = {}
-			buildingTable[currentIndex].name = tokens[1]
-			buildingTable[currentIndex].data = tokens[2]
-			buildingTable[currentIndex].image = tokens[3]
-			buildingTable[currentIndex].width = tonumber(tokens[4])
-			buildingTable[currentIndex].height = tonumber(tokens[5])
-			buildingTable[currentIndex].id = split(tokens[2],"%.")[1]
-		end
-		file:close()
-		
-		--sort the buildings
-		local function compare(a,b)
-			return a.name < b.name
-		end
-		table.sort(buildingTable, compare)
-	end
 end
 
 --function to read in entrance and classroom data
@@ -270,6 +241,10 @@ local function goToMap(event)
 		composer.gotoScene("map", { time=800, effect="crossFade" })
 	end
 end
+
+local function back(event)
+	composer.gotoScene("mainMenu", { time=800, effect="crossFade" })
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -279,9 +254,6 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-
-	--read in the building data
-	readBuildings()
 
 	--set up GUI
 	--set background
@@ -326,6 +298,23 @@ function scene:create( event )
 	goButton:addEventListener("tap", goToMap)
 	goButton.isVisible = false
 	
+	--create back button
+	local backButton = display.newImageRect(sceneGroup, "res/back.png", 40, 40)
+	backButton.anchorX = 0
+	backButton.anchorY = 0
+	backButton.x = 20
+	backButton.y = 20
+	backButton:addEventListener("tap", back)
+	
+	--[[
+	--if we are coming here from buildingMap, set the current building
+	local selectedBuilding = composer.getVariable("selectedBuilding")
+	if selectedBuilding ~= nil then
+		
+		--reset the composer variable
+		composer.setVariable("selectedBuilding", nil)
+	end
+	]]--
 	--add the GPS listener
 	Runtime:addEventListener("location",locationHandler)
 end

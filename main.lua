@@ -9,4 +9,4 @@ local composer = require("composer")
 display.setStatusBar( display.HiddenStatusBar )
  
 -- Go to the menu screen
-composer.gotoScene( "classroomMenu" )
+composer.gotoScene( "mainMenu" )
