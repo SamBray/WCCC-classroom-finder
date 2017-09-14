@@ -2,6 +2,7 @@
 local composer = require( "composer" )
 
 local theme = require("classes.theme")
+local util = require("lib.utility")
 
 local scene = composer.newScene()
 
