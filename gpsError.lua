@@ -37,7 +37,7 @@ function scene:create( event )
 	backButton.y = 20
 	backButton:addEventListener("tap", back)
 	
-	local errorText = display.newText({parent = sceneGroup, text = "Error:\nCould not get a GPS reading", x = display.contentCenterX, y = 100, font = native.systemFont, fontSize = 20, width = display.contentWidth - 20, align = "center"})
+	local errorText = display.newText({parent = sceneGroup, text = "Error:\nCould not get a GPS reading", x = display.contentCenterX, y = 100, font = theme.font, fontSize = 20, width = display.contentWidth - 20, align = "center"})
 	errorText:setFillColor(theme.textColor)
 end
 

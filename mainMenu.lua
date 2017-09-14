@@ -71,12 +71,12 @@ function scene:create( event )
 	background.y = display.contentCenterY
 	
 	--create buttons
-	local findBuildingText = display.newText(sceneGroup, "Find a Building", display.contentCenterX, 150, native.systemFont, 25)
+	local findBuildingText = display.newText(sceneGroup, "Find a Building", display.contentCenterX, 150, theme.font, 25)
 	findBuildingText.anchorY = 0
 	findBuildingText:setFillColor(theme.textColor)
 	findBuildingText:addEventListener("tap", findBuildingListener)
 	
-	local findClassroomText = display.newText(sceneGroup, "Find a Classroom", display.contentCenterX, 200, native.systemFont, 25)
+	local findClassroomText = display.newText(sceneGroup, "Find a Classroom", display.contentCenterX, 200, theme.font, 25)
 	findClassroomText.anchorY = 0
 	findClassroomText:setFillColor(theme.textColor)
 	findClassroomText:addEventListener("tap", findClassroomListener)

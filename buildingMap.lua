@@ -1,6 +1,8 @@
 
 local composer = require( "composer" )
 
+local theme = require("classes.theme")
+
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
@@ -84,8 +86,10 @@ function scene:create( event )
 	local mapWidth = display.contentWidth + 400
 	map = native.newMapView(display.contentCenterX, display.contentCenterY, mapWidth, mapHeight)
 	if map == nil then
-		--probably running on the simulator
+		--probably running on the simulator, or no internet access
 		print("Failed to create map")
+		local errorText = display.newText({parent = sceneGroup, text = "Error: unable to load the map. Make sure you are connected to the internet.", x = display.contentCenterX, y = display.contentCenterY - 60, width = display.contentWidth - 30, font = theme.font, fontSize = 25, align = "center"})
+		errorText:setFillColor(theme.textColor)
 	else
 		--initial setup
 		map.mapType = "standard"
@@ -100,7 +104,7 @@ function scene:create( event )
 			}
 			--associate a building with a marker ID (returned by map:addMarker)
 			local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerSettings)
-			building[i]["marker"] = markerId
+			buildings[i]["marker"] = markerId
 		end
 		
 		--create the back marker

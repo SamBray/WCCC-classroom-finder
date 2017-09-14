@@ -123,7 +123,7 @@ local function onClassroomRowRender(event)
 	local rowHeight = row.contentHeight
 	local rowWidth = row.contentWidth
 	
-	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, native.systemFont, 16)
+	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, theme.font, 16)
 	rowTitle:setFillColor(theme.textColor)
 	rowTitle.anchorX = 0
 end
@@ -166,7 +166,7 @@ local function onBuildingRowRender(event)
 	local rowHeight = row.contentHeight
 	local rowWidth = row.contentWidth
 	
-	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, native.systemFont, 16)
+	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, theme.font, 16)
 	rowTitle:setFillColor(theme.textColor)
 	rowTitle.anchorX = 0
 end
@@ -249,7 +249,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 	
 	--create building items
-	local buildingSelectText = display.newText(sceneGroup, "Select Building:", display.contentCenterX, 30, native.systemFont, 30)
+	local buildingSelectText = display.newText(sceneGroup, "Select Building:", display.contentCenterX, 30, theme.font, 30)
 	buildingSelectText:setFillColor(theme.textColor)
 	
 	buildingTableView = widget.newTableView({
@@ -264,7 +264,7 @@ function scene:create( event )
 	populateBuildingTableView()
 	
 	--create classroom buttons
-	classroomSelectText = display.newText(sceneGroup, "Select Classroom:", display.contentCenterX, 240, native.systemFont, 30)
+	classroomSelectText = display.newText(sceneGroup, "Select Classroom:", display.contentCenterX, 240, theme.font, 30)
 	classroomSelectText:setFillColor(theme.textColor)
 	classroomSelectText.isVisible = false
 	
@@ -280,7 +280,7 @@ function scene:create( event )
 	sceneGroup:insert(classroomTableView)
 	
 	--create go button
-	goButton = display.newText(sceneGroup, "Go!", display.contentCenterX, display.contentHeight - 20, native.systemFont, 30)
+	goButton = display.newText(sceneGroup, "Go!", display.contentCenterX, display.contentHeight - 20, theme.font, 30)
 	goButton:setFillColor(theme.textColor)
 	goButton:addEventListener("tap", goToMap)
 	goButton.isVisible = false
