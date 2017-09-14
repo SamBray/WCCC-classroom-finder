@@ -10,4 +10,6 @@ function M.split(s, delimiter)
     return result;
 end
 
+M.debugText = "ClassroomFinderOutput: "
+
 return M

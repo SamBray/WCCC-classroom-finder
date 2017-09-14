@@ -22,18 +22,31 @@ local function readBuildings()
 	if not file then
 		print("File error: "..errorString)
 	else
+		local mode
 		for line in file:lines() do
-			local currentIndex = #buildingTable + 1
-			local tokens = util.split(line, ",")
-			buildingTable[currentIndex] = {}
-			buildingTable[currentIndex].name = tokens[1]
-			buildingTable[currentIndex].data = tokens[2]
-			buildingTable[currentIndex].latitude = tonumber(tokens[3])
-			buildingTable[currentIndex].longitude = tonumber(tokens[4])
-			buildingTable[currentIndex].image = tokens[5]
-			buildingTable[currentIndex].width = tonumber(tokens[6])
-			buildingTable[currentIndex].height = tonumber(tokens[7])
-			buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
+			if line == "" then
+				--skip
+			elseif line:find("!building") ~= nil then
+				mode = "building"
+			elseif line:find("!center") ~= nil then
+				mode = "center"
+			elseif mode == "building" then
+				local currentIndex = #buildingTable + 1
+				local tokens = util.split(line, ",")
+				buildingTable[currentIndex] = {}
+				buildingTable[currentIndex].name = tokens[1]
+				buildingTable[currentIndex].data = tokens[2]
+				buildingTable[currentIndex].latitude = tonumber(tokens[3])
+				buildingTable[currentIndex].longitude = tonumber(tokens[4])
+				buildingTable[currentIndex].image = tokens[5]
+				buildingTable[currentIndex].width = tonumber(tokens[6])
+				buildingTable[currentIndex].height = tonumber(tokens[7])
+				buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
+			elseif mode == "center" then
+				local tokens = util.split(line, ",")
+				buildingTable.centerLatitude = tonumber(tokens[1])
+				buildingTable.centerLongitude = tonumber(tokens[2])
+			end
 		end
 		file:close()
 		

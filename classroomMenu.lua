@@ -11,7 +11,6 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local debugText = "ClassroomFinderOutput: "
 
 local classroomTable = {}
 local entranceTable = {}
@@ -30,6 +29,7 @@ local currentLatitude
 local currentLongitude
 local gpsError = true
 local gpsTime
+local gpsTimeout = 20000
 
 --create GPS listener
 local function locationHandler(event)
@@ -40,7 +40,7 @@ local function locationHandler(event)
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
-		print("GPS Event: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+		--print("GPS Event: Latitude: "..event.latitude.." Longitude: "..event.longitude)
 	end
 end
 
@@ -55,38 +55,35 @@ local function readBuildingInfo(buildingID, buildingFile)
 		classroomTable[buildingID] = {}
 		entranceTable[buildingID] = {}
 		local mode
-		local index
 		for line in file:lines() do
 			if line == "" then
 				--skip
 			--elseif line == "!classroom" then
 			elseif line:find("!classroom") ~= nil then
 				--set read mode to classroom
-				print(debugText.."Reading classrooms...") 
+				print(util.debugText.."Reading classrooms...") 
 				mode = "classroom"
-				index = 1
 			--elseif line == "!entrance" then
 			elseif line:find("!entrance") ~= nil then
 				--set read mode to entrance
 				mode = "entrance"
-				index = 1
 			elseif mode == "classroom" then
 				--reading a classroom
+				local index = #classroomTable[buildingID] + 1
 				local tokens = util.split(line, ",")
 				classroomTable[buildingID][index] = {}
 				classroomTable[buildingID][index].name = tokens[1]
 				classroomTable[buildingID][index].x = tonumber(tokens[2])
 				classroomTable[buildingID][index].y = tonumber(tokens[3])
-				index = index + 1
 			elseif mode == "entrance" then
 				--reading an entrance
 				local tokens = util.split(line, ",")
+				local index = #entranceTable[buildingID] + 1
 				entranceTable[buildingID][index] = {}
 				entranceTable[buildingID][index].x = tonumber(tokens[1])
 				entranceTable[buildingID][index].y = tonumber(tokens[2])
 				entranceTable[buildingID][index].latitude = tonumber(tokens[3])
 				entranceTable[buildingID][index].longitude = tonumber(tokens[4])
-				index = index + 1
 			end
 		end
 		
@@ -196,8 +193,8 @@ end
 
 --handle go button
 local function goToMap(event)
-	if gpsError or currentLatitude == nil or currentLongitude == nil or (system.getTimer() - gpsTime) > 10000 then
-		--either GPS error, no data recorded on read?? or more than 10 seconds elapsed since last reading (could be inaccurate)
+	if gpsError or currentLatitude == nil or currentLongitude == nil or (system.getTimer() - gpsTime) > gpsTimeout then
+		--either GPS error, no data recorded on read?? or more than 25 seconds elapsed since last reading (could be inaccurate)
 		composer.gotoScene("gpsError", { time=800, effect="crossFade" })
 	else
 		--calculate the closest entrance

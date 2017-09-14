@@ -11,46 +11,24 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 local debugText = "ClassroomFinderOutput: "
 
-local currentLocationMarker
 local map
 local buildings
 
---create GPS listener
-local function locationHandler(event)
-	if(event.errorCode) then
-		print(debugText.."Error in GPS handler!")
-	elseif map ~= nil then
-		--whenever the user moves, update their location
-		if currentLocationMarker ~= nil then
-			--need to remove the old marker
-			map:removeMarker(currentLocationMarker)
-		end
-		--add a new marker at the user's current location
-		currentLocationMarker = map:addMarker(event.latitude, event.longitude, {title = "You Are Here"})
-	end
-end
-
-local function markerHandler(event)
---[[
-	--code for detecting which marker was pushed
-	local currentMarker = event.markerId
-	local buildingTapped
+local function addMarkers()
+	--create markers for buildings
 	for i = 1, #buildings do
-		if buildings[i].marker == currentMarker then
-			buildingTapped = buildings[i]
-			break
-		end
+		local markerSettings = 
+		{
+			title = buildings[i].name,
+			listener = markerHandler
+		}
+		--associate a building with a marker ID (returned by map:addMarker)
+		local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerSettings)
+		buildings[i]["marker"] = markerId
 	end
-	if buildingTapped == nil then
-		print(debugText.."Error handling building touch")
-	else
-		--launch classroomMenu with the current building
-		composer.setVariable("selectedBuilding",buildingTapped)
-		composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
-	end
-]]--
-	--ehh, just go to classroom menu without doing anything fancy
-	composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
+	
+	--create the back marker
+	--map:addMarker(40.235679,-79.569494, {title = "Go Back", listener = back})	
 end
 
 --listener for back button
@@ -93,25 +71,10 @@ function scene:create( event )
 	else
 		--initial setup
 		map.mapType = "standard"
-		map:setCenter(40.234639,-79.566676)
+		map:setCenter(buildings.centerLatitude,buildings.centerLongitude)
 		
-		--create markers for buildings
-		for i = 1, #buildings do
-			local markerSettings = 
-			{
-				title = buildings[i].name,
-				listener = markerHandler,
-			}
-			--associate a building with a marker ID (returned by map:addMarker)
-			local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerSettings)
-			buildings[i]["marker"] = markerId
-		end
-		
-		--create the back marker
-		map:addMarker(40.235679,-79.569494, {title = "Go Back", listener = back})
-		
-		--add the GPS listener
-		Runtime:addEventListener("location",locationHandler)
+		--add markers after delay
+		timer.performWithDelay(500, addMarkers)
 	end
 	
 	--create back button
@@ -153,6 +116,10 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
+		if map then
+			map:removeSelf()
+			map = nil
+		end
 		composer.removeScene("buildingMap")
 	end
 end
