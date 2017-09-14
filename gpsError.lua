@@ -1,13 +1,14 @@
 
 local composer = require( "composer" )
 
+local theme = require("classes.theme")
+
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local textColor = {0,0,0}
 
 local function back(event)
 	composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
@@ -37,7 +38,7 @@ function scene:create( event )
 	backButton:addEventListener("tap", back)
 	
 	local errorText = display.newText({parent = sceneGroup, text = "Error:\nCould not get a GPS reading", x = display.contentCenterX, y = 100, font = native.systemFont, fontSize = 20, width = display.contentWidth - 20, align = "center"})
-	errorText:setFillColor(textColor)
+	errorText:setFillColor(theme.textColor)
 end
 
 

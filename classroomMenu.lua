@@ -2,6 +2,9 @@
 local composer = require( "composer" )
 local widget = require( "widget" )
 
+local theme = require("classes.theme")
+local util = require("lib.utility")
+
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
@@ -9,12 +12,6 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local debugText = "ClassroomFinderOutput: "
-
-local textColor = {0,0,0}
-local backgroundColor = {1,1,1}
-local accentColor = {0,0,0}
-local selectedColor = {30/255,190/255,224/255}
-local overColor = {0,0,.6, .2}
 
 local classroomTable = {}
 local entranceTable = {}
@@ -47,16 +44,6 @@ local function locationHandler(event)
 	end
 end
 
---utility function: split string into table based on delimiter
---credit: https://helloacm.com/split-a-string-in-lua/
-local function split(s, delimiter)
-    result = {};
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        table.insert(result, match);
-    end
-    return result;
-end
-
 --function to read in entrance and classroom data
 local function readBuildingInfo(buildingID, buildingFile)
 	local filePath = system.pathForFile("res/"..buildingFile)
@@ -85,7 +72,7 @@ local function readBuildingInfo(buildingID, buildingFile)
 				index = 1
 			elseif mode == "classroom" then
 				--reading a classroom
-				local tokens = split(line, ",")
+				local tokens = util.split(line, ",")
 				classroomTable[buildingID][index] = {}
 				classroomTable[buildingID][index].name = tokens[1]
 				classroomTable[buildingID][index].x = tonumber(tokens[2])
@@ -93,7 +80,7 @@ local function readBuildingInfo(buildingID, buildingFile)
 				index = index + 1
 			elseif mode == "entrance" then
 				--reading an entrance
-				local tokens = split(line, ",")
+				local tokens = util.split(line, ",")
 				entranceTable[buildingID][index] = {}
 				entranceTable[buildingID][index].x = tonumber(tokens[1])
 				entranceTable[buildingID][index].y = tonumber(tokens[2])
@@ -117,8 +104,8 @@ end
 local function populateClassroomTableView(buildingID)
 	classroomTableView:deleteAllRows()
 	local rowHeight = 40
-	local rowColor = { default=backgroundColor, over=overColor }
-	local lineColor = accentColor
+	local rowColor = { default=theme.backgroundColor, over=theme.overColor }
+	local lineColor = theme.accentColor
 	local classrooms = classroomTable[buildingID]
 	for i = 1, #classrooms do
 		classroomTableView:insertRow({
@@ -137,7 +124,7 @@ local function onClassroomRowRender(event)
 	local rowWidth = row.contentWidth
 	
 	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, native.systemFont, 16)
-	rowTitle:setFillColor(textColor)
+	rowTitle:setFillColor(theme.textColor)
 	rowTitle.anchorX = 0
 end
 
@@ -147,10 +134,10 @@ local function onClassroomRowTouch(event)
 	if event.phase == "tap" or event.phase == "press" then
 		if oldClassroomRow ~= nil and oldClassroomRow.index ~= row.index then
 			--print("Old row index: "..oldBuildingRow.index)
-			oldClassroomRow:setRowColor({default = backgroundColor, over = overColor})
+			oldClassroomRow:setRowColor({default = theme.backgroundColor, over = theme.overColor})
 			classroomTableView:reloadData()
 		end
-		row:setRowColor({default = selectedColor, over = overColor})
+		row:setRowColor({default = theme.selectedColor, over = theme.overColor})
 		--classroomTableView:reloadData()
 		oldClassroomRow = row
 	end
@@ -160,8 +147,8 @@ end
 --functions for building tableview
 local function populateBuildingTableView()
 	local rowHeight = 40
-	local rowColor = { default=backgroundColor, over=overColor }
-	local lineColor = accentColor
+	local rowColor = { default=theme.backgroundColor, over=theme.overColor }
+	local lineColor = theme.accentColor
 	
 	for i = 1, #buildingTable do
 		buildingTableView:insertRow({
@@ -180,7 +167,7 @@ local function onBuildingRowRender(event)
 	local rowWidth = row.contentWidth
 	
 	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, native.systemFont, 16)
-	rowTitle:setFillColor(textColor)
+	rowTitle:setFillColor(theme.textColor)
 	rowTitle.anchorX = 0
 end
 
@@ -195,10 +182,10 @@ local function onBuildingRowTouch(event)
 		--change row colors
 		if oldBuildingRow ~= nil and oldBuildingRow.index ~= row.index then
 			--print("Old row index: "..oldBuildingRow.index)
-			oldBuildingRow:setRowColor({default = backgroundColor, over = overColor})
+			oldBuildingRow:setRowColor({default = theme.backgroundColor, over = theme.overColor})
 			buildingTableView:reloadData()
 		end
-		row:setRowColor({default = selectedColor, over = overColor})
+		row:setRowColor({default = theme.selectedColor, over = theme.overColor})
 		oldBuildingRow = row
 		
 		--populate classroom selector
@@ -263,7 +250,7 @@ function scene:create( event )
 	
 	--create building items
 	local buildingSelectText = display.newText(sceneGroup, "Select Building:", display.contentCenterX, 30, native.systemFont, 30)
-	buildingSelectText:setFillColor(textColor)
+	buildingSelectText:setFillColor(theme.textColor)
 	
 	buildingTableView = widget.newTableView({
 		x = display.contentCenterX,
@@ -278,7 +265,7 @@ function scene:create( event )
 	
 	--create classroom buttons
 	classroomSelectText = display.newText(sceneGroup, "Select Classroom:", display.contentCenterX, 240, native.systemFont, 30)
-	classroomSelectText:setFillColor(textColor)
+	classroomSelectText:setFillColor(theme.textColor)
 	classroomSelectText.isVisible = false
 	
 	--create classroom tableview
@@ -294,7 +281,7 @@ function scene:create( event )
 	
 	--create go button
 	goButton = display.newText(sceneGroup, "Go!", display.contentCenterX, display.contentHeight - 20, native.systemFont, 30)
-	goButton:setFillColor(textColor)
+	goButton:setFillColor(theme.textColor)
 	goButton:addEventListener("tap", goToMap)
 	goButton.isVisible = false
 	

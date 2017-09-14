@@ -1,24 +1,16 @@
 
 local composer = require( "composer" )
 
+local theme = require("classes.theme")
+local util = require("lib.utility")
+
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local textColor = {0,0,0}
 local backgroundColor = {1,1,1}
-
---utility function: split string into table based on delimiter
---credit: https://helloacm.com/split-a-string-in-lua/
-local function split(s, delimiter)
-    result = {};
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        table.insert(result, match);
-    end
-    return result;
-end
 
 --file reading functions
 local function readBuildings()
@@ -32,7 +24,7 @@ local function readBuildings()
 	else
 		for line in file:lines() do
 			local currentIndex = #buildingTable + 1
-			local tokens = split(line, ",")
+			local tokens = util.split(line, ",")
 			buildingTable[currentIndex] = {}
 			buildingTable[currentIndex].name = tokens[1]
 			buildingTable[currentIndex].data = tokens[2]
@@ -41,7 +33,7 @@ local function readBuildings()
 			buildingTable[currentIndex].image = tokens[5]
 			buildingTable[currentIndex].width = tonumber(tokens[6])
 			buildingTable[currentIndex].height = tonumber(tokens[7])
-			buildingTable[currentIndex].id = split(tokens[2],"%.")[1]
+			buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
 		end
 		file:close()
 		
@@ -81,12 +73,12 @@ function scene:create( event )
 	--create buttons
 	local findBuildingText = display.newText(sceneGroup, "Find a Building", display.contentCenterX, 150, native.systemFont, 25)
 	findBuildingText.anchorY = 0
-	findBuildingText:setFillColor(textColor)
+	findBuildingText:setFillColor(theme.textColor)
 	findBuildingText:addEventListener("tap", findBuildingListener)
 	
 	local findClassroomText = display.newText(sceneGroup, "Find a Classroom", display.contentCenterX, 200, native.systemFont, 25)
 	findClassroomText.anchorY = 0
-	findClassroomText:setFillColor(textColor)
+	findClassroomText:setFillColor(theme.textColor)
 	findClassroomText:addEventListener("tap", findClassroomListener)
 	
 	--read in the building data and set composer variables
