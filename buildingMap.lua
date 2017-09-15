@@ -62,7 +62,7 @@ function scene:create( event )
 	map = native.newMapView(display.contentCenterX, display.contentCenterY, mapWidth, mapHeight)
 	if map == nil then
 		--probably running on the simulator, or no internet access
-		print("Failed to create map")
+		--print("Failed to create map")
 		--load error background
 		local errorImageDim
 		if display.contentHeight > 512 then
@@ -74,8 +74,11 @@ function scene:create( event )
 		errorImage.x = display.contentCenterX
 		errorImage.y = display.contentCenterY
 		
-		local errorText = display.newText({parent = sceneGroup, text = "Error: unable to load the map. Make sure you are connected to the internet.", x = display.contentCenterX, y = display.contentCenterY - 60, width = display.contentWidth - 30, font = theme.font, fontSize = 25, align = "center"})
-		errorText:setFillColor(theme.textColor)
+		--load error message
+		local errorTextWidth, errorTextHeight = util.getCenteredImageSize(405, 171, 20)
+		local errorText = display.newImageRect(sceneGroup, "res/mapError.png", errorTextWidth, errorTextHeight)
+		errorText.x = display.contentCenterX
+		errorText.y = display.contentCenterY - 50
 	else
 		--initial setup
 		map.mapType = "standard"

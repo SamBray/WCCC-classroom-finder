@@ -2,6 +2,7 @@
 local composer = require( "composer" )
 
 local theme = require("classes.theme")
+local util = require("lib.utility")
 
 local scene = composer.newScene()
 
@@ -30,6 +31,7 @@ function scene:create( event )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
+	--display the error background image
 	local errorImageDim
 	if display.contentHeight > 512 then
 		errorImageDim = 512
@@ -48,8 +50,11 @@ function scene:create( event )
 	backButton.y = 20
 	backButton:addEventListener("tap", back)
 	
-	local errorText = display.newText({parent = sceneGroup, text = "Error:\nCould not get a GPS reading", x = display.contentCenterX, y = 100, font = theme.font, fontSize = 20, width = display.contentWidth - 20, align = "center"})
-	errorText:setFillColor(theme.textColor)
+	--display the error message
+	local errorTextWidth, errorTextHeight = util.getCenteredImageSize(352, 135, 20)
+	local errorText = display.newImageRect(sceneGroup, "res/gpsError.png", errorTextWidth, errorTextHeight)
+	errorText.x = display.contentCenterX
+	errorText.y = display.contentCenterY - 50
 end
 
 
