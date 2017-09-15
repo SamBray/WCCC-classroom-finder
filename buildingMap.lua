@@ -56,10 +56,6 @@ function scene:create( event )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
-	--create groups
-	uiGroup = display.newGroup()
-	sceneGroup:insert(uiGroup)
-	
 	--create map
 	local mapHeight = display.contentHeight + 400
 	local mapWidth = display.contentWidth + 400
@@ -67,6 +63,17 @@ function scene:create( event )
 	if map == nil then
 		--probably running on the simulator, or no internet access
 		print("Failed to create map")
+		--load error background
+		local errorImageDim
+		if display.contentHeight > 512 then
+			errorImageDim = 512
+		else
+			errorImageDim = display.contentHeight
+		end
+		local errorImage = display.newImageRect(sceneGroup, "res/error_img.png", errorImageDim, errorImageDim)
+		errorImage.x = display.contentCenterX
+		errorImage.y = display.contentCenterY
+		
 		local errorText = display.newText({parent = sceneGroup, text = "Error: unable to load the map. Make sure you are connected to the internet.", x = display.contentCenterX, y = display.contentCenterY - 60, width = display.contentWidth - 30, font = theme.font, fontSize = 25, align = "center"})
 		errorText:setFillColor(theme.textColor)
 	else
@@ -77,6 +84,10 @@ function scene:create( event )
 		--add markers after delay
 		timer.performWithDelay(500, addMarkers)
 	end
+	
+	--create UI group
+	uiGroup = display.newGroup()
+	sceneGroup:insert(uiGroup)
 	
 	--create back button
 	local backButton = display.newImageRect(uiGroup, "res/back.png", 40, 40)

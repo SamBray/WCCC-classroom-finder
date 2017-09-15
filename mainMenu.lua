@@ -79,20 +79,34 @@ function scene:create( event )
 	
 	--set up GUI
 	--set background
-	local background = display.newImageRect(sceneGroup, "res/MapBackground.png", 1500, 1500)
+	local background = display.newImageRect(sceneGroup, "res/mainMenuBackground.jpg", 1024, 626)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
-	--create buttons
-	local findBuildingText = display.newText(sceneGroup, "Find a Building", display.contentCenterX, 150, theme.font, 25)
-	findBuildingText.anchorY = 0
-	findBuildingText:setFillColor(theme.textColor)
-	findBuildingText:addEventListener("tap", findBuildingListener)
+	--create the logo
+	local logoHeight, logoWidth
+	logoWidth, logoHeight = util.getCenteredImageSize(450, 208, 15)
+	local logo = display.newImageRect(sceneGroup, "res/logo.png", logoWidth, logoHeight)
+	logo.anchorY = 0
+	logo.x = display.contentCenterX
+	logo.y = 30
 	
-	local findClassroomText = display.newText(sceneGroup, "Find a Classroom", display.contentCenterX, 200, theme.font, 25)
-	findClassroomText.anchorY = 0
-	findClassroomText:setFillColor(theme.textColor)
-	findClassroomText:addEventListener("tap", findClassroomListener)
+	
+	--create buttons
+	local buttonHeight
+	local buttonWidth
+	buttonWidth, buttonHeight = util.getCenteredImageSize(601, 163, 30)
+	local findBuildingButton = display.newImageRect(sceneGroup, "res/findBuildingButton.png", buttonWidth, buttonHeight)
+	findBuildingButton.anchorY = 0
+	findBuildingButton.y = display.contentHeight - buttonHeight * 2 - 50 - 35
+	findBuildingButton.x = display.contentCenterX
+	findBuildingButton:addEventListener("tap", findBuildingListener)
+	
+	local findClassroomButton = display.newImageRect(sceneGroup, "res/findClassroomButton.png", buttonWidth, buttonHeight)
+	findClassroomButton.anchorY = 0
+	findClassroomButton.y = display.contentHeight - buttonHeight - 50
+	findClassroomButton.x = display.contentCenterX
+	findClassroomButton:addEventListener("tap", findClassroomListener)
 	
 	--read in the building data and set composer variables
 	local buildingTable = readBuildings()

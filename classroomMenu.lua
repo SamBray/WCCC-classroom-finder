@@ -29,7 +29,7 @@ local currentLatitude
 local currentLongitude
 local gpsError = true
 local gpsTime
-local gpsTimeout = 20000
+local gpsTimeout = 15000
 
 --create GPS listener
 local function locationHandler(event)
@@ -187,6 +187,7 @@ local function onBuildingRowTouch(event)
 		
 		--populate classroom selector
 		classroomSelectText.isVisible = true
+		classroomTableView.isVisible = true
 		populateClassroomTableView(params.id)
 	end
 end
@@ -241,13 +242,17 @@ function scene:create( event )
 
 	--set up GUI
 	--set background
-	local background = display.newImageRect(sceneGroup, "res/MapBackground.png", 1500, 1500)
+	local background = display.newImageRect(sceneGroup, "res/mainMenuBackground.jpg", 1024, 626)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
 	--create building items
-	local buildingSelectText = display.newText(sceneGroup, "Select Building:", display.contentCenterX, 30, theme.font, 30)
-	buildingSelectText:setFillColor(theme.textColor)
+	local textWidth, textHeight
+	textWidth, textHeight = util.getCenteredImageSize(442, 125, 65)
+	local buildingSelectText = display.newImageRect(sceneGroup, "res/buildingSelectText.png", textWidth, textHeight)
+	buildingSelectText.anchorY = 0
+	buildingSelectText.y = 10
+	buildingSelectText.x = display.contentCenterX
 	
 	buildingTableView = widget.newTableView({
 		x = display.contentCenterX,
@@ -260,27 +265,35 @@ function scene:create( event )
 	sceneGroup:insert(buildingTableView)
 	populateBuildingTableView()
 	
-	--create classroom buttons
-	classroomSelectText = display.newText(sceneGroup, "Select Classroom:", display.contentCenterX, 240, theme.font, 30)
-	classroomSelectText:setFillColor(theme.textColor)
+	--create classroom items
+	textWidth = (textHeight / 125) * 465
+	classroomSelectText = display.newImageRect(sceneGroup, "res/classroomSelectText.png", textWidth, textHeight)
+	classroomSelectText.anchorY = 0
+	classroomSelectText.y = 200
+	classroomSelectText.x = display.contentCenterX
 	classroomSelectText.isVisible = false
 	
 	--create classroom tableview
 	classroomTableView = widget.newTableView({
 		x = display.contentCenterX,
-		y = 350,
+		y = 339,
 		height = 160,
 		width = display.contentWidth - 50,
 		onRowRender = onClassroomRowRender,
 		onRowTouch = onClassroomRowTouch
 	})
+	classroomTableView.isVisible = false
 	sceneGroup:insert(classroomTableView)
 	
 	--create go button
-	goButton = display.newText(sceneGroup, "Go!", display.contentCenterX, display.contentHeight - 20, theme.font, 30)
-	goButton:setFillColor(theme.textColor)
-	goButton:addEventListener("tap", goToMap)
+	local buttonHeight = textHeight
+	local buttonWidth = (textHeight / 125) * 125
+	goButton = display.newImageRect(sceneGroup, "res/goButton.png", buttonWidth, buttonHeight)
+	goButton.anchorY = 0
+	goButton.y = display.contentHeight - buttonHeight
+	goButton.x = display.contentCenterX
 	goButton.isVisible = false
+	goButton:addEventListener("tap", goToMap)
 	
 	--create back button
 	local backButton = display.newImageRect(sceneGroup, "res/back.png", 40, 40)

@@ -30,6 +30,17 @@ function scene:create( event )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
+	local errorImageDim
+	if display.contentHeight > 512 then
+		errorImageDim = 512
+	else
+		errorImageDim = display.contentHeight
+	end
+	
+	local errorImage = display.newImageRect(sceneGroup, "res/error_img.png", errorImageDim, errorImageDim)
+	errorImage.x = display.contentCenterX
+	errorImage.y = display.contentCenterY
+	
 	local backButton = display.newImageRect(sceneGroup, "res/back.png", 40, 40)
 	backButton.anchorX = 0
 	backButton.anchorY = 0

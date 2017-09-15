@@ -3,10 +3,10 @@
 M = {}
 
 M.textColor = {0,0,0}
-M.backgroundColor = {1,1,1}
+M.backgroundColor = {123/255,224/255,124/255,.2}
 M.accentColor = {0,0,0}
-M.selectedColor = {30/255,190/255,224/255}
-M.overColor = {0,0,.6,.2}
+M.selectedColor = {123/255,224/255,124/255}
+M.overColor = {123/255,224/255,124/255,.2}
 M.font = native.systemFont
 
 return M
