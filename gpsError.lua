@@ -11,8 +11,8 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local function back(event)
-	composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
+local function goToMap()
+	composer.gotoScene("map", { time=800, effect="crossFade" })
 end
 
 
@@ -27,32 +27,20 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 
-	local background = display.newImageRect(sceneGroup, "res/MapBackground.png", 1500, 1500)
+	local background = display.newImageRect(sceneGroup, "res/gpsErrorBackground.jpg", 800 * .8, 1067 * .8)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
-	--display the error background image
-	local errorImageDim
-	if display.contentHeight > 512 then
-		errorImageDim = 512
+	--display the appropriate error message
+	local errorTextWidth, errorTextHeight = util.getCenteredImageSize(357, 162, 20)
+	local errorText
+	local status = composer.getVariable("gpsStatus")
+	if status == "none" then
+		errorText = display.newImageRect(sceneGroup, "res/gpsErrorNone.png", errorTextWidth, errorTextHeight)
 	else
-		errorImageDim = display.contentHeight
+		--status == "timeout"
+		errorText = display.newImageRect(sceneGroup, "res/gpsErrorTimeout.png", errorTextWidth, errorTextHeight)
 	end
-	
-	local errorImage = display.newImageRect(sceneGroup, "res/error_img.png", errorImageDim, errorImageDim)
-	errorImage.x = display.contentCenterX
-	errorImage.y = display.contentCenterY
-	
-	local backButton = display.newImageRect(sceneGroup, "res/back.png", 40, 40)
-	backButton.anchorX = 0
-	backButton.anchorY = 0
-	backButton.x = 20
-	backButton.y = 20
-	backButton:addEventListener("tap", back)
-	
-	--display the error message
-	local errorTextWidth, errorTextHeight = util.getCenteredImageSize(352, 135, 20)
-	local errorText = display.newImageRect(sceneGroup, "res/gpsError.png", errorTextWidth, errorTextHeight)
 	errorText.x = display.contentCenterX
 	errorText.y = display.contentCenterY - 50
 end
@@ -69,7 +57,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-
+		timer.performWithDelay(4000,goToMap)
 	end
 end
 

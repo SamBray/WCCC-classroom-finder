@@ -30,16 +30,12 @@ local goButton
 
 local currentLatitude
 local currentLongitude
-local gpsError = true
 local gpsTime
-local gpsTimeout = 15000
+local gpsTimeout = 1000
 
 --create GPS listener
 local function locationHandler(event)
-	if(event.errorCode) then
-		gpsError = true
-	else
-		gpsError = false
+	if not (event.errorCode) then
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
@@ -154,8 +150,8 @@ local function onClassroomRowTouch(event)
 			--print("touched row "..row.index)
 			classroomTableView:reloadData()
 		--end
+		goButton.isVisible = true
 	end
-	goButton.isVisible = true
 end
 
 --functions for building tableview
@@ -225,11 +221,21 @@ end
 
 --handle go button
 local function goToMap(event)
-	if gpsError or currentLatitude == nil or currentLongitude == nil or (system.getTimer() - gpsTime) > gpsTimeout then
-		--either GPS error, no data recorded on read?? or more than 25 seconds elapsed since last reading (could be inaccurate)
+	--set up table for map except for entrance info
+	local mapTable = {}
+	mapTable.mapFile = currentBuilding.image
+	mapTable.mapHeight = currentBuilding.height
+	mapTable.mapWidth = currentBuilding.width
+	mapTable.classroomX = currentClassroom.x
+	mapTable.classroomY = currentClassroom.y
+	
+	if currentLatitude == nil or currentLongitude == nil then
+		--no GPS data is currently available - leave mapTable.entranceX and Y as nil and set gpsStatus
+		composer.setVariable("mapTable", mapTable)
+		composer.setVariable("gpsStatus", "none")
 		composer.gotoScene("gpsError", { time=800, effect="crossFade" })
 	else
-		--calculate the closest entrance
+		--we have GPS data, so calculate closest entrance...
 		local lat = currentLatitude
 		local long = currentLongitude
 		local bestDistance = math.huge
@@ -242,18 +248,20 @@ local function goToMap(event)
 			end
 		end
 		
-		--set up table for map
-		local mapTable = {}
-		mapTable.mapFile = currentBuilding.image
-		mapTable.mapHeight = currentBuilding.height
-		mapTable.mapWidth = currentBuilding.width
-		mapTable.classroomX = currentClassroom.x
-		mapTable.classroomY = currentClassroom.y
 		mapTable.entranceX = entranceTable[currentBuilding.id][bestEntrance].x
 		mapTable.entranceY = entranceTable[currentBuilding.id][bestEntrance].y
+		
 		composer.setVariable("mapTable", mapTable)
 		
-		composer.gotoScene("map", { time=800, effect="crossFade" })
+		if (system.getTimer() - gpsTime) > gpsTimeout then
+			--...but the data is older than the timeout
+			composer.setVariable("gpsStatus","timeout")
+			composer.gotoScene("gpsError", { time=800, effect="crossFade" })
+		else
+			--...and the data is recent
+			composer.setVariable("gpsStatus","current")
+			composer.gotoScene("map", { time=800, effect="crossFade" })
+		end
 	end
 end
 

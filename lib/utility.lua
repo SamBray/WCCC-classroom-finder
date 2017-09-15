@@ -10,7 +10,7 @@ function M.split(s, delimiter)
     return result;
 end
 
---for a centered image, determine of the desired margin is too big. 
+--for a centered image, determine of the desired margin will make the image too big. 
 --if so, return max width and height, else return scaled width and height
 function M.getCenteredImageSize(maxWidth, maxHeight, margin)
 	local width, height

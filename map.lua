@@ -98,7 +98,7 @@ function scene:create( event )
 	uiGroup = display.newGroup()
 	sceneGroup:insert(uiGroup)
 	
-	--create and init map and flags
+	--create and init map
 	local map = display.newImageRect(mapGroup, "res/"..mapData.mapFile, mapData.mapWidth, mapData.mapHeight)
 	map.anchorX = 0
 	map.anchorY = 0
@@ -106,18 +106,27 @@ function scene:create( event )
 	mapGroup.xScale = mapGroupScale
 	mapGroup.yScale = mapGroupScale
 	
-	--set initial map location
-	mapGroup.x = display.contentCenterX - mapData.entranceX * mapGroupScale
-	mapGroup.y = display.contentCenterY - mapData.entranceY * mapGroupScale
-	checkBounds()
+	--create and init map flags
+	if composer.getVariable("gpsStatus") ~= "none" then
+		--center map on entrance
+		mapGroup.x = display.contentCenterX - mapData.entranceX * mapGroupScale
+		mapGroup.y = display.contentCenterY - mapData.entranceY * mapGroupScale
+		checkBounds()
 
-	--set initial flag locations
-	local entranceFlag = display.newImageRect(mapGroup, "res/StartFlag.png", flagWidth, flagHeight)
-	entranceFlag.anchorX = flagBase/flagWidth
-	entranceFlag.anchorY = 1
-	entranceFlag.x = mapData.entranceX
-	entranceFlag.y = mapData.entranceY
+		--set entrance flag location
+		local entranceFlag = display.newImageRect(mapGroup, "res/StartFlag.png", flagWidth, flagHeight)
+		entranceFlag.anchorX = flagBase/flagWidth
+		entranceFlag.anchorY = 1
+		entranceFlag.x = mapData.entranceX
+		entranceFlag.y = mapData.entranceY
+	else
+		--center map on classroom
+		mapGroup.x = display.contentCenterX - mapData.classroomX * mapGroupScale
+		mapGroup.y = display.contentCenterY - mapData.classroomY * mapGroupScale
+		checkBounds()
+	end
 	
+	--set classroom flag location
 	local classroomFlag = display.newImageRect(mapGroup, "res/EndFlag.png", flagWidth, flagHeight)
 	classroomFlag.anchorX = flagBase/flagWidth
 	classroomFlag.anchorY = 1
