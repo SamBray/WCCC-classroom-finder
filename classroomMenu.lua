@@ -198,19 +198,28 @@ local function onBuildingRowTouch(event)
 	local params = row.params
 
 	if event.phase == "release" then
-		--if required, read in classroom and entrance data for the building
-		if classroomTable[params.id] == nil then
-			readBuildingInfo(params.id, params.data)
+		if row.index ~= currentBuildingRowIndex then
+			--if required, read in classroom and entrance data for the building
+			if classroomTable[params.id] == nil then
+				readBuildingInfo(params.id, params.data)
+			end
+			
+			--reset classroom variables
+			currentClassroomRowIndex = nil
+			currentClassroom = nil
+			
+			--hide the go button until the user selects a classroom
+			goButton.isVisible = false
+			
+			currentBuildingRowIndex = row.index
+			currentBuilding = params
+			buildingTableView:reloadData()
+			
+			--populate classroom selector
+			classroomSelectText.isVisible = true
+			classroomTableView.isVisible = true
+			populateClassroomTableView(params.id)
 		end
-		
-		currentBuildingRowIndex = row.index
-		currentBuilding = params
-		buildingTableView:reloadData()
-		
-		--populate classroom selector
-		classroomSelectText.isVisible = true
-		classroomTableView.isVisible = true
-		populateClassroomTableView(params.id)
 	end
 end
 
