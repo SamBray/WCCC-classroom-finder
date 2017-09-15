@@ -79,7 +79,7 @@ function scene:create( event )
 	
 	--set up GUI
 	--set background
-	local background = display.newImageRect(sceneGroup, "res/mainMenuBackground.jpg", 1024, 626)
+	local background = display.newImageRect(sceneGroup, "res/mainMenuBackground.jpg", 700, 933)
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
