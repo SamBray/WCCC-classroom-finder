@@ -24,15 +24,16 @@ local function readBuildings()
 	else
 		local mode
 		for line in file:lines() do
-			if line == "" then
-				--skip
-			elseif line:find("!building") ~= nil then
+			local tokens = util.split(line, ",")
+			
+			if line:find("!building") ~= nil then
 				mode = "building"
 			elseif line:find("!center") ~= nil then
 				mode = "center"
+			elseif #tokens < 3 then
+				--skip
 			elseif mode == "building" then
 				local currentIndex = #buildingTable + 1
-				local tokens = util.split(line, ",")
 				buildingTable[currentIndex] = {}
 				buildingTable[currentIndex].name = tokens[1]
 				buildingTable[currentIndex].data = tokens[2]

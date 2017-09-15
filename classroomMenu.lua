@@ -55,10 +55,9 @@ local function readBuildingInfo(buildingID, buildingFile)
 		entranceTable[buildingID] = {}
 		local mode
 		for line in file:lines() do
-			if line == "" then
-				--skip
-			--elseif line == "!classroom" then
-			elseif line:find("!classroom") ~= nil then
+			--if line == "!classroom" then
+			local tokens = util.split(line, ",")
+			if line:find("!classroom") ~= nil then
 				--set read mode to classroom
 				print(util.debugText.."Reading classrooms...") 
 				mode = "classroom"
@@ -66,17 +65,17 @@ local function readBuildingInfo(buildingID, buildingFile)
 			elseif line:find("!entrance") ~= nil then
 				--set read mode to entrance
 				mode = "entrance"
+			elseif #tokens < 3 then
+				--skip
 			elseif mode == "classroom" then
 				--reading a classroom
 				local index = #classroomTable[buildingID] + 1
-				local tokens = util.split(line, ",")
 				classroomTable[buildingID][index] = {}
 				classroomTable[buildingID][index].name = tokens[1]
 				classroomTable[buildingID][index].x = tonumber(tokens[2])
 				classroomTable[buildingID][index].y = tonumber(tokens[3])
 			elseif mode == "entrance" then
 				--reading an entrance
-				local tokens = util.split(line, ",")
 				local index = #entranceTable[buildingID] + 1
 				entranceTable[buildingID][index] = {}
 				entranceTable[buildingID][index].x = tonumber(tokens[1])
