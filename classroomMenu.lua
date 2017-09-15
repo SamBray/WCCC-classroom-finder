@@ -17,10 +17,13 @@ local entranceTable = {}
 local buildingTable = composer.getVariable("buildings")
 
 local buildingTableView
-local oldBuildingRow
+local currentBuildingRowIndex
+local currentBuilding
 
 local classroomTableView
-local oldClassroomRow
+local currentClassroomRowIndex
+local currentClassroom
+
 local classroomSelectText
 
 local goButton
@@ -120,23 +123,37 @@ local function onClassroomRowRender(event)
 	local rowHeight = row.contentHeight
 	local rowWidth = row.contentWidth
 	
+	--print("Rendering row "..row.index)
+	
+	
 	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, theme.font, 16)
-	rowTitle:setFillColor(theme.textColor)
+	if rowTitle.setFillColor then
+		rowTitle:setFillColor(theme.textColor)
+	end
 	rowTitle.anchorX = 0
+	
+	if currentClassroomRowIndex and row.index == (currentClassroomRowIndex) then
+		--row:setRowColor({default = theme.selectedColor, over = theme.overColor})
+		local checkMark = display.newImageRect( row, "res/checkmark.png", 30, 30 )
+		checkMark.x = rowWidth - 30
+		checkMark.y = rowTitle.y
+	else
+		--print("row is not selected")
+		--row:setRowColor({default = theme.backgroundColor, over = theme.overColor})
+	end
 end
 
 local function onClassroomRowTouch(event)
 	local row = event.target
 	local params = row.params
-	if event.phase == "tap" or event.phase == "press" then
-		if oldClassroomRow ~= nil and oldClassroomRow.index ~= row.index then
-			--print("Old row index: "..oldBuildingRow.index)
-			oldClassroomRow:setRowColor({default = theme.backgroundColor, over = theme.overColor})
+
+	if event.phase == "release" then
+		--if row.index ~= currentClassroomRowIndex then
+			currentClassroomRowIndex = row.index
+			currentClassroom = params
+			--print("touched row "..row.index)
 			classroomTableView:reloadData()
-		end
-		row:setRowColor({default = theme.selectedColor, over = theme.overColor})
-		--classroomTableView:reloadData()
-		oldClassroomRow = row
+		--end
 	end
 	goButton.isVisible = true
 end
@@ -164,26 +181,31 @@ local function onBuildingRowRender(event)
 	local rowWidth = row.contentWidth
 	
 	local rowTitle = display.newText(row, params.name, 20, rowHeight * 0.5, theme.font, 16)
-	rowTitle:setFillColor(theme.textColor)
+	if rowTitle.setFillColor then
+		rowTitle:setFillColor(theme.textColor)
+	end
 	rowTitle.anchorX = 0
+	
+	if currentBuildingRowIndex and row.index == (currentBuildingRowIndex) then
+		local checkMark = display.newImageRect( row, "res/checkmark.png", 30, 30 )
+		checkMark.x = rowWidth - 30
+		checkMark.y = rowTitle.y
+	end
 end
 
 local function onBuildingRowTouch(event)
 	local row = event.target
 	local params = row.params
-	if event.phase == "tap" or event.phase == "press" then
+
+	if event.phase == "release" then
 		--if required, read in classroom and entrance data for the building
 		if classroomTable[params.id] == nil then
 			readBuildingInfo(params.id, params.data)
 		end
-		--change row colors
-		if oldBuildingRow ~= nil and oldBuildingRow.index ~= row.index then
-			--print("Old row index: "..oldBuildingRow.index)
-			oldBuildingRow:setRowColor({default = theme.backgroundColor, over = theme.overColor})
-			buildingTableView:reloadData()
-		end
-		row:setRowColor({default = theme.selectedColor, over = theme.overColor})
-		oldBuildingRow = row
+		
+		currentBuildingRowIndex = row.index
+		currentBuilding = params
+		buildingTableView:reloadData()
 		
 		--populate classroom selector
 		classroomSelectText.isVisible = true
@@ -203,9 +225,8 @@ local function goToMap(event)
 		local long = currentLongitude
 		local bestDistance = math.huge
 		local bestEntrance = 0
-		local currentBuilding = oldBuildingRow.params.id
-		for index = 1, #(entranceTable[currentBuilding]) do
-			local dist = math.sqrt((lat - entranceTable[currentBuilding][index].latitude)^2 + (long - entranceTable[currentBuilding][index].longitude)^2)
+		for index = 1, #(entranceTable[currentBuilding.id]) do
+			local dist = math.sqrt((lat - entranceTable[currentBuilding.id][index].latitude)^2 + (long - entranceTable[currentBuilding.id][index].longitude)^2)
 			if dist < bestDistance then
 				bestDistance = dist
 				bestEntrance = index
@@ -214,13 +235,13 @@ local function goToMap(event)
 		
 		--set up table for map
 		local mapTable = {}
-		mapTable.mapFile = oldBuildingRow.params.image
-		mapTable.mapHeight = oldBuildingRow.params.height
-		mapTable.mapWidth = oldBuildingRow.params.width
-		mapTable.classroomX = oldClassroomRow.params.x
-		mapTable.classroomY = oldClassroomRow.params.y
-		mapTable.entranceX = entranceTable[currentBuilding][bestEntrance].x
-		mapTable.entranceY = entranceTable[currentBuilding][bestEntrance].y
+		mapTable.mapFile = currentBuilding.image
+		mapTable.mapHeight = currentBuilding.height
+		mapTable.mapWidth = currentBuilding.width
+		mapTable.classroomX = currentClassroom.x
+		mapTable.classroomY = currentClassroom.y
+		mapTable.entranceX = entranceTable[currentBuilding.id][bestEntrance].x
+		mapTable.entranceY = entranceTable[currentBuilding.id][bestEntrance].y
 		composer.setVariable("mapTable", mapTable)
 		
 		composer.gotoScene("map", { time=800, effect="crossFade" })
@@ -287,7 +308,7 @@ function scene:create( event )
 	
 	--create go button
 	local buttonHeight = textHeight
-	local buttonWidth = (textHeight / 125) * 125
+	local buttonWidth = (textHeight / 85) * 125
 	goButton = display.newImageRect(sceneGroup, "res/goButton.png", buttonWidth, buttonHeight)
 	goButton.anchorY = 0
 	goButton.y = display.contentHeight - buttonHeight
