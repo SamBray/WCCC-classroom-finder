@@ -31,7 +31,7 @@ local goButton
 local currentLatitude
 local currentLongitude
 local gpsTime
-local gpsTimeout = 1000
+local gpsTimeout = 15000
 
 --create GPS listener
 local function locationHandler(event)
