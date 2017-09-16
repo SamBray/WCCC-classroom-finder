@@ -39,7 +39,7 @@ local function locationHandler(event)
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
-		--print(util.debugText.."GPS Event: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
+		print(util.debugText.."GPS Event in classroomMenu: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
 	end
 end
 
@@ -287,6 +287,17 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 
+	--receive GPS data from the main menu
+	local gpsCoords = composer.getVariable("gpsCoordinates")
+	if gpsCoords.latitude and gpsCoords.longitude then
+		--main menu got a GPS reading
+		if not gpsTime or gpsCoords.time > gpsTime then
+			--this scene has no GPS readings or the reading is older than the one from the main menu
+			currentLatitude = gpsCoords.latitude
+			currentLongitude = gpsCoords.longitude
+			gpsTime = gpsCoords.time
+		end
+	end
 	--set up GUI
 	--set background
 	local background = display.newImageRect(sceneGroup, "res/classroomMenuBackground.jpg", 800, 965)

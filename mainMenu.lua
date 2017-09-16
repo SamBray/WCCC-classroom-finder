@@ -10,7 +10,17 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local backgroundColor = {1,1,1}
+local gpsCoordinates = {}
+
+--create GPS listener
+local function locationHandler(event)
+	if not (event.errorCode) then
+		gpsCoordinates.latitude = event.latitude
+		gpsCoordinates.longitude = event.longitude
+		gpsCoordinates.time = system.getTimer()
+		print(util.debugText.."GPS Event in mainMenu: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+	end
+end
 
 --file reading functions
 local function readBuildings()
@@ -77,6 +87,8 @@ function findBuildingListener()
 end
 
 function findClassroomListener()
+	--send any gps coordinates to the classroomMenu
+	composer.setVariable("gpsCoordinates", gpsCoordinates)
 	composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
 end
 
@@ -126,6 +138,8 @@ function scene:create( event )
 	--composer.setVariable("selectedBuilding", nil)
 	composer.setVariable("buildings", buildingTable)
 	
+	--add the GPS listener
+	Runtime:addEventListener("location",locationHandler)
 end
 
 

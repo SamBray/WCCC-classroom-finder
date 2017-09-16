@@ -21,18 +21,19 @@ end
 local function addMarkers()
 	--create markers for buildings
 	for i = 1, #buildings do
-		local markerSettings = 
+		local markerOptions = 
 		{
 			title = buildings[i].name,
 		}
 		--associate a building with a marker ID (returned by map:addMarker)
-		local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerSettings)
+		local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerOptions)
 		buildings[i]["marker"] = markerId
 	end
 	
 	--create the back marker
 	if buildings.backLatitude and buildings.backLongitude then
-		map:addMarker(buildings.backLatitude,buildings.backLongitude, {title = "Go Back", listener = back, imageFile = "res/back.png"})
+		local markerOptions = {title = "Go Back", listener = back, imageFile = "res/backSmall.png"}
+		map:addMarker(buildings.backLatitude,buildings.backLongitude, markerOptions)
 	end
 end
 
