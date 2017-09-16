@@ -74,6 +74,24 @@ local function zoomOut(event)
 	return true
 end
 
+local function createFlag(image, x, y)
+	local flag = display.newImageRect(mapGroup, image, flagWidth, flagHeight)
+	flag.anchorX = flagBase/flagWidth
+	flag.anchorY = 1
+	if x > mapData.mapWidth - (flagWidth - flagBase) then
+		--prevent the flag from going off the screen
+		flag.x = mapData.mapWidth - (flagWidth - flagBase)
+	else
+		flag.x = x
+	end
+	if y < flagHeight then
+		--prevent the flag from going off the screen
+		flag.y = flagHeight
+	else
+		flag.y = y
+	end
+end
+
 local function back(event)
 	composer.gotoScene("classroomMenu", { time=800, effect="crossFade" })
 end
@@ -114,11 +132,7 @@ function scene:create( event )
 		checkBounds()
 
 		--set entrance flag location
-		local entranceFlag = display.newImageRect(mapGroup, "res/StartFlag.png", flagWidth, flagHeight)
-		entranceFlag.anchorX = flagBase/flagWidth
-		entranceFlag.anchorY = 1
-		entranceFlag.x = mapData.entranceX
-		entranceFlag.y = mapData.entranceY
+		createFlag("res/StartFlag.png", mapData.entranceX, mapData.entranceY)
 	else
 		--center map on classroom
 		mapGroup.x = display.contentCenterX - mapData.classroomX * mapGroupScale
@@ -127,11 +141,7 @@ function scene:create( event )
 	end
 	
 	--set classroom flag location
-	local classroomFlag = display.newImageRect(mapGroup, "res/EndFlag.png", flagWidth, flagHeight)
-	classroomFlag.anchorX = flagBase/flagWidth
-	classroomFlag.anchorY = 1
-	classroomFlag.x = mapData.classroomX
-	classroomFlag.y = mapData.classroomY
+	createFlag("res/EndFlag.png", mapData.classroomX, mapData.classroomY)
 	
 	--add the movement listener for the mapGroup
 	mapGroup:addEventListener("touch", dragMap)
