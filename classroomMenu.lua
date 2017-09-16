@@ -39,7 +39,7 @@ local function locationHandler(event)
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
-		--print("GPS Event: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+		--print(util.debugText.."GPS Event: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
 	end
 end
 
@@ -49,7 +49,7 @@ local function readBuildingInfo(buildingID, buildingFile)
 	local file, errorString = io.open(filePath, "r")
 	
 	if not file then
-		print("File error: "..errorString)
+		print(util.debugText.."File error: "..errorString)
 	else
 		classroomTable[buildingID] = {}
 		entranceTable[buildingID] = {}
@@ -59,7 +59,6 @@ local function readBuildingInfo(buildingID, buildingFile)
 			local tokens = util.split(line, ",")
 			if line:find("!classroom") ~= nil then
 				--set read mode to classroom
-				print(util.debugText.."Reading classrooms...") 
 				mode = "classroom"
 			--elseif line == "!entrance" then
 			elseif line:find("!entrance") ~= nil then
@@ -69,19 +68,23 @@ local function readBuildingInfo(buildingID, buildingFile)
 				--skip
 			elseif mode == "classroom" then
 				--reading a classroom
-				local index = #classroomTable[buildingID] + 1
-				classroomTable[buildingID][index] = {}
-				classroomTable[buildingID][index].name = tokens[1]
-				classroomTable[buildingID][index].x = tonumber(tokens[2])
-				classroomTable[buildingID][index].y = tonumber(tokens[3])
+				if tonumber(tokens[2]) and tonumber(tokens[3]) then
+					local index = #classroomTable[buildingID] + 1
+					classroomTable[buildingID][index] = {}
+					classroomTable[buildingID][index].name = tokens[1]
+					classroomTable[buildingID][index].x = tonumber(tokens[2])
+					classroomTable[buildingID][index].y = tonumber(tokens[3])
+				end
 			elseif mode == "entrance" then
 				--reading an entrance
-				local index = #entranceTable[buildingID] + 1
-				entranceTable[buildingID][index] = {}
-				entranceTable[buildingID][index].x = tonumber(tokens[1])
-				entranceTable[buildingID][index].y = tonumber(tokens[2])
-				entranceTable[buildingID][index].latitude = tonumber(tokens[3])
-				entranceTable[buildingID][index].longitude = tonumber(tokens[4])
+				if #tokens >= 4 and tonumber(tokens[1]) and tonumber(tokens[2]) and tonumber(tokens[3]) and tonumber(tokens[4]) then
+					local index = #entranceTable[buildingID] + 1
+					entranceTable[buildingID][index] = {}
+					entranceTable[buildingID][index].x = tonumber(tokens[1])
+					entranceTable[buildingID][index].y = tonumber(tokens[2])
+					entranceTable[buildingID][index].latitude = tonumber(tokens[3])
+					entranceTable[buildingID][index].longitude = tonumber(tokens[4])
+				end
 			end
 		end
 		
@@ -247,19 +250,27 @@ local function goToMap(event)
 			end
 		end
 		
-		mapTable.entranceX = entranceTable[currentBuilding.id][bestEntrance].x
-		mapTable.entranceY = entranceTable[currentBuilding.id][bestEntrance].y
-		
-		composer.setVariable("mapTable", mapTable)
-		
-		if (system.getTimer() - gpsTime) > gpsTimeout then
-			--...but the data is older than the timeout
-			composer.setVariable("gpsStatus","timeout")
-			composer.gotoScene("gpsError", { time=800, effect="crossFade" })
-		else
-			--...and the data is recent
-			composer.setVariable("gpsStatus","current")
+		if bestEntrance == 0 then
+			--no entrances for the given building
+			composer.setVariable("gpsStatus", "none")
+			composer.setVariable("mapTable", mapTable)
 			composer.gotoScene("map", { time=800, effect="crossFade" })
+		else
+			mapTable.entranceX = entranceTable[currentBuilding.id][bestEntrance].x
+			mapTable.entranceY = entranceTable[currentBuilding.id][bestEntrance].y
+			print(util.debugText.."Best entrance at "..mapTable.entranceX..","..mapTable.entranceY)
+			
+			composer.setVariable("mapTable", mapTable)
+			
+			if (system.getTimer() - gpsTime) > gpsTimeout then
+				--...but the data is older than the timeout
+				composer.setVariable("gpsStatus","timeout")
+				composer.gotoScene("gpsError", { time=800, effect="crossFade" })
+			else
+				--...and the data is recent
+				composer.setVariable("gpsStatus","current")
+				composer.gotoScene("map", { time=800, effect="crossFade" })
+			end
 		end
 	end
 end

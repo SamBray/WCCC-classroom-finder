@@ -82,7 +82,11 @@ function scene:create( event )
 	else
 		--initial setup
 		map.mapType = "standard"
-		map:setCenter(buildings.centerLatitude,buildings.centerLongitude)
+		if buildings.centerLatitude and buildings.centerLongitude then
+			map:setCenter(buildings.centerLatitude,buildings.centerLongitude)
+		else
+			map:setCenter(0,0)
+		end
 		
 		--add markers after delay
 		timer.performWithDelay(500, addMarkers)

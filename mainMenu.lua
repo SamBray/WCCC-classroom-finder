@@ -30,23 +30,26 @@ local function readBuildings()
 				mode = "building"
 			elseif line:find("!center") ~= nil then
 				mode = "center"
-			elseif #tokens < 3 then
+			elseif #tokens < 2 then
 				--skip
 			elseif mode == "building" then
-				local currentIndex = #buildingTable + 1
-				buildingTable[currentIndex] = {}
-				buildingTable[currentIndex].name = tokens[1]
-				buildingTable[currentIndex].data = tokens[2]
-				buildingTable[currentIndex].latitude = tonumber(tokens[3])
-				buildingTable[currentIndex].longitude = tonumber(tokens[4])
-				buildingTable[currentIndex].image = tokens[5]
-				buildingTable[currentIndex].width = tonumber(tokens[6])
-				buildingTable[currentIndex].height = tonumber(tokens[7])
-				buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
+				if #tokens <= 7 and tonumber(tokens[3]) and tonumber(tokens[4]) and tonumber(tokens[6]) and tonumber(tokens[7]) then
+					local currentIndex = #buildingTable + 1
+					buildingTable[currentIndex] = {}
+					buildingTable[currentIndex].name = tokens[1]
+					buildingTable[currentIndex].data = tokens[2]
+					buildingTable[currentIndex].latitude = tonumber(tokens[3])
+					buildingTable[currentIndex].longitude = tonumber(tokens[4])
+					buildingTable[currentIndex].image = tokens[5]
+					buildingTable[currentIndex].width = tonumber(tokens[6])
+					buildingTable[currentIndex].height = tonumber(tokens[7])
+					buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
+				end
 			elseif mode == "center" then
-				local tokens = util.split(line, ",")
-				buildingTable.centerLatitude = tonumber(tokens[1])
-				buildingTable.centerLongitude = tonumber(tokens[2])
+				if tonumber(tokens[1]) and tonumber(tokens[2]) then
+					buildingTable.centerLatitude = tonumber(tokens[1])
+					buildingTable.centerLongitude = tonumber(tokens[2])
+				end
 			end
 		end
 		file:close()
