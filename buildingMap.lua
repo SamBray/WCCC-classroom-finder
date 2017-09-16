@@ -10,10 +10,13 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local debugText = "ClassroomFinderOutput: "
-
 local map
-local buildings
+local buildings = composer.getVariable("buildings")
+
+--listener for back button and marker
+local function back(event)
+	composer.gotoScene("mainMenu", { time=800, effect="crossFade" })
+end
 
 local function addMarkers()
 	--create markers for buildings
@@ -21,7 +24,6 @@ local function addMarkers()
 		local markerSettings = 
 		{
 			title = buildings[i].name,
-			listener = markerHandler
 		}
 		--associate a building with a marker ID (returned by map:addMarker)
 		local markerId = map:addMarker(buildings[i].latitude, buildings[i].longitude,markerSettings)
@@ -29,12 +31,9 @@ local function addMarkers()
 	end
 	
 	--create the back marker
-	--map:addMarker(40.235679,-79.569494, {title = "Go Back", listener = back})	
-end
-
---listener for back button
-local function back(event)
-	composer.gotoScene("mainMenu", { time=800, effect="crossFade" })
+	if buildings.backLatitude and buildings.backLongitude then
+		map:addMarker(buildings.backLatitude,buildings.backLongitude, {title = "Go Back", listener = back, imageFile = "res/back.png"})
+	end
 end
 
 
@@ -47,8 +46,6 @@ end
 function scene:create( event )
 
 	local sceneGroup = self.view
-	--get buildings
-	buildings = composer.getVariable("buildings")
 	
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	--insert background

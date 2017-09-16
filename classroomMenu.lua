@@ -258,7 +258,6 @@ local function goToMap(event)
 		else
 			mapTable.entranceX = entranceTable[currentBuilding.id][bestEntrance].x
 			mapTable.entranceY = entranceTable[currentBuilding.id][bestEntrance].y
-			print(util.debugText.."Best entrance at "..mapTable.entranceX..","..mapTable.entranceY)
 			
 			composer.setVariable("mapTable", mapTable)
 			

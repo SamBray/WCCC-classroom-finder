@@ -30,6 +30,8 @@ local function readBuildings()
 				mode = "building"
 			elseif line:find("!center") ~= nil then
 				mode = "center"
+			elseif line:find("!back") ~= nil then
+				mode = "back"
 			elseif #tokens < 2 then
 				--skip
 			elseif mode == "building" then
@@ -46,9 +48,16 @@ local function readBuildings()
 					buildingTable[currentIndex].id = util.split(tokens[2],"%.")[1]
 				end
 			elseif mode == "center" then
+				--record the coords where the center of the campus map should be
 				if tonumber(tokens[1]) and tonumber(tokens[2]) then
 					buildingTable.centerLatitude = tonumber(tokens[1])
 					buildingTable.centerLongitude = tonumber(tokens[2])
+				end
+			elseif mode == "back" then
+				--record the coords where the back marker on the map should go
+				if tonumber(tokens[1]) and tonumber(tokens[2]) then
+					buildingTable.backLatitude = tonumber(tokens[1])
+					buildingTable.backLongitude = tonumber(tokens[2])
 				end
 			end
 		end
