@@ -18,7 +18,7 @@ local function locationHandler(event)
 		gpsCoordinates.latitude = event.latitude
 		gpsCoordinates.longitude = event.longitude
 		gpsCoordinates.time = system.getTimer()
-		print(util.debugText.."GPS Event in mainMenu: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+		--print(util.debugText.."GPS Event in mainMenu: Latitude: "..event.latitude.." Longitude: "..event.longitude)
 	end
 end
 

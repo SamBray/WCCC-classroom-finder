@@ -56,6 +56,14 @@ end
 
 local function zoomIn(event)
 	if mapGroupScale < 1 then
+		--calculate the new location of the point that is currently centered
+		local centerX = (display.contentCenterX - mapGroup.x) * (mapGroupScale + .1) / (mapGroupScale)
+		local centerY = (display.contentCenterY - mapGroup.y) * (mapGroupScale + .1) / (mapGroupScale)
+		--center that point on the screen
+		mapGroup.x = display.contentCenterX - centerX
+		mapGroup.y = display.contentCenterY - centerY
+		
+		--set the scaling
 		mapGroup.xScale = mapGroup.xScale + .1
 		mapGroup.yScale = mapGroup.yScale + .1
 		mapGroupScale = mapGroupScale + .1
@@ -66,6 +74,14 @@ end
 
 local function zoomOut(event)
 	if mapGroupScale > .2 then
+		--calculate the new location of the point that is currently centered
+		local centerX = (display.contentCenterX - mapGroup.x) * (mapGroupScale - .1) / mapGroupScale
+		local centerY = (display.contentCenterY - mapGroup.y) * (mapGroupScale - .1) / mapGroupScale
+		--center that point on the screen
+		mapGroup.x = display.contentCenterX - centerX
+		mapGroup.y = display.contentCenterY - centerY
+		
+		--set the scaling
 		mapGroup.xScale = mapGroup.xScale - .1
 		mapGroup.yScale = mapGroup.yScale - .1
 		mapGroupScale = mapGroupScale - .1

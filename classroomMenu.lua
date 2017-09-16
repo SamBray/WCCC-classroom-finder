@@ -39,7 +39,7 @@ local function locationHandler(event)
 		currentLatitude = event.latitude
 		currentLongitude = event.longitude
 		gpsTime = system.getTimer()
-		print(util.debugText.."GPS Event in classroomMenu: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
+		--print(util.debugText.."GPS Event in classroomMenu: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
 	end
 end
 
