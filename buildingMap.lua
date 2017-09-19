@@ -73,7 +73,7 @@ function scene:create( event )
 		errorImage.y = display.contentCenterY
 		
 		--load error message
-		local errorTextWidth, errorTextHeight = util.getCenteredImageSize(405, 171, 20)
+		local errorTextWidth, errorTextHeight = util.getCenteredImageSize(405, 169, 20)
 		local errorText = display.newImageRect(sceneGroup, "res/mapError.png", errorTextWidth, errorTextHeight)
 		errorText.x = display.contentCenterX
 		errorText.y = display.contentCenterY - 50
