@@ -36,10 +36,12 @@ local gpsTimeout = 15000
 --create GPS listener
 local function locationHandler(event)
 	if not (event.errorCode) then
-		currentLatitude = event.latitude
-		currentLongitude = event.longitude
-		gpsTime = system.getTimer()
-		--print(util.debugText.."GPS Event in classroomMenu: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
+		if event.latitude and event.longitude then
+			currentLatitude = event.latitude
+			currentLongitude = event.longitude
+			gpsTime = system.getTimer()
+			--print(util.debugText.."GPS Event in classroomMenu: Latitude: "..currentLatitude.." Longitude: "..currentLongitude)
+		end
 	end
 end
 

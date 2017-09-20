@@ -37,6 +37,8 @@ settings =
 		{
 			UIStatusBarHidden = false,
 			UILaunchStoryboardName = "LaunchScreen",
+			NSLocationAlwaysUsageDescription = "This app would like to use location services.",
+            NSLocationWhenInUseUsageDescription = "This app would like to use location services.",
 			CFBundleIconFiles =
 			{
 				"Icon-40.png",

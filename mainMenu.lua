@@ -15,10 +15,12 @@ local gpsCoordinates = {}
 --create GPS listener
 local function locationHandler(event)
 	if not (event.errorCode) then
-		gpsCoordinates.latitude = event.latitude
-		gpsCoordinates.longitude = event.longitude
-		gpsCoordinates.time = system.getTimer()
-		--print(util.debugText.."GPS Event in mainMenu: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+		if event.latitude and event.longitude then
+			gpsCoordinates.latitude = event.latitude
+			gpsCoordinates.longitude = event.longitude
+			gpsCoordinates.time = system.getTimer()
+			--print(util.debugText.."GPS Event in mainMenu: Latitude: "..event.latitude.." Longitude: "..event.longitude)
+		end
 	end
 end
 
